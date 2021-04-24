@@ -1,169 +1,157 @@
 import './style.css'
 import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import * as dat from 'dat.gui'
+import { OBJLoader } from '../node_modules/three/examples/jsm/loaders/OBJLoader.js';
+import { MTLLoader } from '../node_modules/three/examples/jsm/loaders/MTLLoader.js';
 
-// Debug
-const gui = new dat.GUI()
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+// import * as dat from 'dat.gui'
 
-// Canvas
+// -- Set Scene
+const scene = new THREE.Scene();
+const width = window.innerWidth;
+const height = window.innerHeight;
+
 const canvas = document.querySelector('canvas.webgl')
-
-// Scene
-const scene = new THREE.Scene()
-
-// Texture Loader
-const loader = new THREE.TextureLoader();
-const cross = loader.load('./cross.png');
-
-// Objects
-const sphereGeometry = new THREE.SphereBufferGeometry( .7, 32, 32);
-const starFieldGeometry = new THREE.BufferGeometry;
-const particlesCnt = 5000;
-
-const posArray = new Float32Array(particlesCnt * 3);
-
-for ( let i = 0; i < particlesCnt * 3; i++ ) {
-    posArray[i] = (Math.random() - 0.5) * (Math.random() * 5);
-}
-
-starFieldGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-
-// Materials
-
-// particlesSphere
-// const sphereMaterial = new THREE.PointsMaterial({
-//     size: 0.005
-// })
-
-// solidSphere
-const sphereMaterial = new THREE.MeshStandardMaterial({
-    color: 0xffffff,
-    roughness: 0.2,
-    transparent: false,
-    opacity: 1,
-    wireframe: true // disable when done
-})
-
-const particlesMaterial = new THREE.PointsMaterial({
-    size: 0.005,
-    map: cross,
-    transparent: true,
-    // color: 'white',
-    // blending: THREE.AdditiveBlending
-})
-
-// Mesh
-const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial)
-const starField = new THREE.Points(starFieldGeometry, particlesMaterial)
-scene.add(sphere, starField)
-
-// Lights
-const pointLight = new THREE.PointLight(0xffffff, 0.5)
-pointLight.position.set(2,3,4)
-scene.add(pointLight)
-
-const pointLight2 = new THREE.PointLight(0xffffff, 0.5)
-pointLight2.position.set(-2,-3,-4)
-scene.add(pointLight2)
-
-const pointLight3 = new THREE.PointLight(0xffff00, 0.5)
-pointLight3.position.set(6,6,6)
-scene.add(pointLight3)
-
-/**
- * Sizes
- */
-const sizes = {
-    width: window.innerWidth,
-    height: window.innerHeight
-}
-
-window.addEventListener('resize', () =>
-{
-    // Update sizes
-    sizes.width = window.innerWidth
-    sizes.height = window.innerHeight
-
-    // Update camera
-    camera.aspect = sizes.width / sizes.height
-    camera.updateProjectionMatrix()
-
-    // Update renderer
-    renderer.setSize(sizes.width, sizes.height)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-})
-
-/**
- * Camera
- */
-// Base camera
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.x = 0
-camera.position.y = 0
-camera.position.z = 2
-scene.add(camera)
-
-// Controls
-// const controls = new OrbitControls(camera, canvas)
-// controls.enableDamping = true
-
-/**
- * Renderer
- */
+const camera = new THREE.PerspectiveCamera(35, width / height, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
     alpha: true
-})
-renderer.setSize(sizes.width, sizes.height)
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-// renderer.setClearColor(new THREE.Color('#21282a'), 1)
+});
 
-// Mouse
-document.addEventListener('mousemove', animateParticles);
+renderer.setSize(width, height);
+// renderer.setClearColor( 0xcccccc, 1 ); 
 
-let mouseX = 0;
-let mouseY = 0;
+scene.add(camera);
 
-function animateParticles(e) {
-    mouseY = e.clientY * 0.1;
-    mouseX = e.clientX * 0.1;
-}
-/**
- * Animate
- */
+camera.position.copy(new THREE.Vector3(fti(0), fti(0), fti(15)));
+// fix first frame render issue going invisible
+camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-const clock = new THREE.Clock()
+// -- Empty Parent 
+const parentContainer = new THREE.Mesh();
+scene.add(parentContainer);
 
-const tick = () => {
+const circles = createCircles();
+circles.forEach(c => {
+    parentContainer.add(c);
+});
 
-    const elapsedTime = clock.getElapsedTime()
+// rotate the parent in the animation render()
+function createCircles() {
+    const offsetDistance = 40;
+    const offsetVectors = []
+    const circles = [];
 
-    // Update objects
-    // sphere.rotation.y = .5 * elapsedTime
-    sphere.rotation.z = .05 * elapsedTime
+    for (let i = 0; i < 40; i++) {
+        let angle = (2 * Math.PI) / offsetDistance;
+        let x = offsetDistance * Math.cos(i * angle);
+        let y = offsetDistance * Math.sin(i * angle)
 
-    // animate before mousemove
-    starField.rotation.y = elapsedTime * -0.01;
-    starField.rotation.x = elapsedTime * -0.01;
-    
-    // animate on mousemove
-    if (mouseX > 0) {
-        starField.rotation.x = -mouseY * (elapsedTime * 0.00004);
-        starField.rotation.y = -mouseX * (elapsedTime * 0.00004);
+        let objectVector = new THREE.Vector3(x, y, 0);
 
-        sphere.rotation.x = mouseY * (1.1 * 0.0003);
-        sphere.rotation.y = mouseX * (1.1 * 0.0003);
+        /* console.log({objectVector}); */
+
+        offsetVectors.push(objectVector)
     }
-    
-    // Update Orbital Controls
-    // controls.update()
 
-    // Render
-    renderer.render(scene, camera)
+    offsetVectors.forEach(function (i) {
+        //TODO : debug .gltf issues
+        // generateObject(i)
 
-    // Call tick again on the next frame
-    window.requestAnimationFrame(tick)
+        circles.push(generateObject(i));
+    });
+
+    // apply the offset distance to each offsetVector
+    offsetVectors.forEach(offsetVector => {
+        offsetVector.setLength(offsetDistance);
+    });
+
+    // add the offset vectors to each circle to give them their offset starting position
+    for (let i = 0; i < circles.length; i++) {
+        circles[i].position.add(offsetVectors[i]);
+    }
+    // console.log({circles})
+
+    return circles;
 }
 
-tick()
+// Lights
+const pointLight = new THREE.DirectionalLight(0xffffff, 1, 100)
+pointLight.position.set(12, 13, 14)
+pointLight.castShadow = true;
+scene.add(pointLight)
+
+// const pointLight2 = new THREE.PointLight(0xffffff, 0.5)
+// pointLight2.position.set(-2,-3,-4)
+// scene.add(pointLight2)
+
+// const pointLight3 = new THREE.PointLight(0xffff00, 0.5)
+// pointLight3.position.set(6,6,6)
+// scene.add(pointLight3)
+
+// - Render Function
+const render = function () {
+
+    // rotate the parent
+    if (parentContainer) {
+        parentContainer.rotateZ(.001);
+        // keeps the circle upright
+        circles.forEach(c => { 
+            c.rotation.z -= .01; 
+        });
+
+    }
+
+    requestAnimationFrame(render);
+    renderer.render(scene, camera);
+};
+
+// - Helper Functions
+
+// Window Resize Responsive
+window.addEventListener('resize', () => {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight;
+
+    camera.updateProjectionMatrix();
+})
+
+// Camera position helper
+function fti(feet) {
+    return feet * 12;
+}
+// console.log({circles})
+
+// Create each individual sphere
+function generateObject(i) {
+    //TODO : debug .gltf issues
+    // const loader = new GLTFLoader();
+    // loader.load('liptid-node.gltf', function ( gltf ) {
+    //     let gltfObject = gltf.scene.children[0];
+    //     scene.add(gltfObject);
+
+    //     gltfObject.position.set(i)
+    //     // console.log({gltfObject})
+    //     // circles.push(gltfObject);
+    //     return gltfObject;
+    // });
+
+    // console.log({gltfObject})
+    
+    // ------
+    const sphereGeometry = new THREE.SphereBufferGeometry(2, 32, 32);
+    const sphereMaterial = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        roughness: 0.7,
+        transparent: true,
+        opacity: 1
+    });
+    const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial)
+    // console.log({sphere});
+    scene.add(sphere);
+    return sphere;
+}
+
+// - Call Render
+render();
