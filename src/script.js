@@ -1,10 +1,11 @@
 import './style.css'
 import * as THREE from 'three'
-import { OBJLoader } from '../node_modules/three/examples/jsm/loaders/OBJLoader.js';
-import { MTLLoader } from '../node_modules/three/examples/jsm/loaders/MTLLoader.js';
+// import { OBJLoader } from '../node_modules/three/examples/jsm/loaders/OBJLoader.js';
+// import { MTLLoader } from '../node_modules/three/examples/jsm/loaders/MTLLoader.js';
 
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+// import { Vector3 } from 'three';
 // import * as dat from 'dat.gui'
 
 // -- Set Scene
@@ -18,6 +19,9 @@ const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
     alpha: true
 });
+
+// Controls
+const controls = new OrbitControls( camera, renderer.domElement );
 
 renderer.setSize(width, height);
 // renderer.setClearColor( 0xcccccc, 1 ); 
@@ -122,6 +126,26 @@ function fti(feet) {
     return feet * 12;
 }
 // console.log({circles})
+
+// node shape
+// const loader = new GLTFLoader();
+
+// loader.load('liptid-node.gltf', function ( gltf ) {
+
+//     let gltfObject = gltf.scene.children[0];
+
+//     // Resize Object
+//     gltfObject.scale.set(0.05, 0.05, 0.05);
+//     gltfObject.rotation.set(3.2, 1.5, 0)
+//     console.log({gltfObject});
+
+//     scene.add(gltfObject);
+
+//     gltfObject.position.set(i)
+//     // console.log({gltfObject})
+//     // circles.push(gltfObject);
+//     return gltfObject;
+// });
 
 // Create each individual sphere
 function generateObject(i) {
