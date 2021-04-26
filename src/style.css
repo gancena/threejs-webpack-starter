@@ -9,7 +9,7 @@ body
 {
     height: 100vh;
     font-family: 'Poppins';
-    background: rgba(0,0,0,1)
+    background: rgba(0,0,0,0.1)
 }
 
 .webgl {
@@ -17,10 +17,16 @@ body
     top: 0;
     left: 0;
     outline: none;
-    -webkit-mask-image: url("../static/grit.png");
-    mask-image: url("../static/grit.png");
-    -webkit-mask-repeat: repeat;
-    mask-repeat:repeat;
-    -webkit-mask-size: 180px;
-    mask-size:180px;
+    -webkit-mask-image: url("../static/healthspan-texture.png");
+    mask-image: url("../static/healthspan-texture.png");
+    /* -webkit-mask-repeat: repeat;
+    mask-repeat:repeat; */
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: 2137px;
+    mask-size: 2137px;
+    -webkit-mask-mode: luminance;
+    mask-mode: luminance;
+    -webkit-mask-type: alpha;
+    mask-type: alpha;
 }

@@ -2,7 +2,6 @@ import './style.css'
 import * as THREE from 'three'
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 // -- Set Scene
 let scene = new THREE.Scene();
@@ -10,14 +9,13 @@ const width = window.innerWidth;
 const height = window.innerHeight;
 
 const canvas = document.querySelector('canvas.webgl')
-const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(95, width / height, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
     alpha: true
 });
 
 // Controls
-const controls = new OrbitControls( camera, renderer.domElement );
 
 renderer.setSize(width, height);
 scene.add(camera);
@@ -32,7 +30,8 @@ pointLight.position.set(12, 13, 14)
 pointLight.castShadow = true;
 scene.add(pointLight)
 
-var liptideNodes;
+let liptideNodes;
+let mrnaStrand;
 // // - Render Functions
 const clock = new THREE.Clock()
 const render = function () {
@@ -42,8 +41,17 @@ const render = function () {
         liptideNodes.rotation.z = -.1 * elapsedTime;
 
         if (mouseX > 0) {
-            liptideNodes.rotation.y = (-mouseX) * (elapsedTime * 0.00002 );
-            liptideNodes.rotation.x = (-mouseY) * (elapsedTime * 0.00002 );
+            liptideNodes.rotation.y = (-mouseX) * (elapsedTime * 0.000005 );
+            liptideNodes.rotation.x = (-mouseY) * (elapsedTime * 0.000005 );
+        }   
+    }
+
+    if (mrnaStrand) {
+        mrnaStrand.rotation.x = -2 * elapsedTime;
+
+        if (mouseX > 0) {
+            mrnaStrand.rotation.y = (-mouseX) * (elapsedTime * 0.000005 );
+            mrnaStrand.rotation.z = (-mouseY) * (elapsedTime * 0.000005 );
         }   
     }
 
@@ -81,12 +89,18 @@ function fti(feet) {
 // node shape
 const loader = new GLTFLoader().setPath( 'models/' );;
 
-loader.load('liptid-radial-24.gltf', function ( gltf ) {
+loader.load('liptid-radial-24-round.gltf', function ( gltf ) {
     
     liptideNodes = gltf.scene;
 
-    scene.add(gltf.scene);
+    scene.add(liptideNodes);
 });
+
+loader.load('mrna-strand.gltf', function ( gltf ) {
+    mrnaStrand = gltf.scene;
+
+    scene.add(mrnaStrand);
+})
 
 // // - Call Render
 
