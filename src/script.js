@@ -33,16 +33,35 @@ pointLight.castShadow = true;
 scene.add(pointLight)
 
 var liptideNodes;
-// // - Render Function
+// // - Render Functions
 const clock = new THREE.Clock()
 const render = function () {
     const elapsedTime = clock.getElapsedTime()
 
-    if (liptideNodes) liptideNodes.rotation.z = -.1 * elapsedTime;
+    if (liptideNodes) {
+        liptideNodes.rotation.z = -.1 * elapsedTime;
+
+        if (mouseX > 0) {
+            liptideNodes.rotation.y = (-mouseX) * (elapsedTime * 0.00002 );
+            liptideNodes.rotation.x = (-mouseY) * (elapsedTime * 0.00002 );
+        }   
+    }
 
     requestAnimationFrame(render);
+
     renderer.render(scene, camera);
 };
+
+// Animate Liptid Nodes
+document.addEventListener('mousemove', animateLiptidNodes);
+
+let mouseX = 0;
+let mouseY = 0;
+
+function animateLiptidNodes(e) {
+    mouseY = e.clientY;
+    mouseX = e.clientX;
+}
 
 // - Helper Functions
 
