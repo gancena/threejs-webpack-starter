@@ -23,12 +23,8 @@ renderer.setSize(width, height);
 scene.add(camera);
 
 camera.position.copy(new THREE.Vector3(fti(0), fti(0), fti(15)));
-// fix first frame render issue going invisible
 camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-// scene.add(parentContainer);
-
-// rotate the parent in the animation render()
 
 // Lights
 const pointLight = new THREE.DirectionalLight(0xffffff, 1, 100)
@@ -36,7 +32,7 @@ pointLight.position.set(12, 13, 14)
 pointLight.castShadow = true;
 scene.add(pointLight)
 
-// - Render Function
+// // - Render Function
 const render = function () {
 
     requestAnimationFrame(render);
@@ -44,6 +40,9 @@ const render = function () {
 };
 
 // - Helper Functions
+
+let mixer;
+const clock = new THREE.Clock(); 
 
 // Window Resize Responsive
 window.addEventListener('resize', () => {
@@ -62,12 +61,17 @@ function fti(feet) {
 const loader = new GLTFLoader().setPath( 'models/' );;
 
 loader.load('liptid-radial-24.gltf', function ( gltf ) {
+    
+    mixer = new THREE.AnimationMixer(gltf.scene);
+    gltf.animations.forEach((clip) => {mixer.clipAction(clip).play(); });
 
     scene.add(gltf.scene);
-
-    console.log({scene}, {gltf})
-
 });
 
-// - Call Render
+console.log('2', {loader})
+
+// // - Call Render
+
 render();
+var delta = clock.getDelta();
+mixer.update( delta )
