@@ -12,10 +12,15 @@ body
     background: rgba(0,0,0,0.3)
 }
 
-.webgl
-{
+.webgl {
     position: fixed;
     top: 0;
     left: 0;
     outline: none;
+    -webkit-mask-image: url("../static/grit.png");
+    mask-image: url("../static/grit.png");
+    -webkit-mask-repeat: repeat;
+    mask-repeat:repeat;
+    -webkit-mask-size: 180px;
+    mask-size:180px;
 }

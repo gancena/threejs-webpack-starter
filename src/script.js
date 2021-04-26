@@ -32,17 +32,19 @@ pointLight.position.set(12, 13, 14)
 pointLight.castShadow = true;
 scene.add(pointLight)
 
+var liptideNodes;
 // // - Render Function
+const clock = new THREE.Clock()
 const render = function () {
+    const elapsedTime = clock.getElapsedTime()
+
+    if (liptideNodes) liptideNodes.rotation.z = -.1 * elapsedTime;
 
     requestAnimationFrame(render);
     renderer.render(scene, camera);
 };
 
 // - Helper Functions
-
-let mixer;
-const clock = new THREE.Clock(); 
 
 // Window Resize Responsive
 window.addEventListener('resize', () => {
@@ -62,16 +64,11 @@ const loader = new GLTFLoader().setPath( 'models/' );;
 
 loader.load('liptid-radial-24.gltf', function ( gltf ) {
     
-    mixer = new THREE.AnimationMixer(gltf.scene);
-    gltf.animations.forEach((clip) => {mixer.clipAction(clip).play(); });
+    liptideNodes = gltf.scene;
 
     scene.add(gltf.scene);
 });
 
-console.log('2', {loader})
-
 // // - Call Render
 
 render();
-var delta = clock.getDelta();
-mixer.update( delta )
